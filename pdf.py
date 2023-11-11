@@ -35,16 +35,16 @@ class PDF:
 
         column_widths = [self.pdf.get_string_width(str(col)) + 10 for col in columns]
 
-        self.pdf.cell(column_widths[0], 5, txt='', border=1)
+        self.pdf.cell(column_widths[0], 5, txt='', border=0)
 
         for index, (width, col) in enumerate(zip(column_widths, columns)):
-            self.pdf.cell(width, 5, txt=col, border=1, align='C')
+            self.pdf.cell(width, 5, txt=col, border=0, align='C')
         self.pdf.ln()
 
         for key, sub_dict in data.items():
-            self.pdf.cell(column_widths[0], 5, txt=str(key), border=1)
+            self.pdf.cell(column_widths[0], 5, txt=str(key), border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
-                self.pdf.cell(width, 4, txt=str(sub_dict[col]), border=1, align='C')
+                self.pdf.cell(width, 4, txt=str(sub_dict[col]), border=0, align='C')
             self.pdf.ln()
 
 

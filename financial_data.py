@@ -5,6 +5,7 @@ class FinancialData:
     def __init__(self):
         pass
 
+
     def get_equity_data(self, indices):
         data = {}
         for index in indices:

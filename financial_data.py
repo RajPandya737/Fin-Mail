@@ -39,7 +39,7 @@ class FinancialData:
                         prices[ind] = 'n/a'
                         prices['p_diff_' + ind] = 'n/a'
             data[index] = prices
-        return data
+        return self.round_floats_in_dict(data)
 
     def get_currency_data(self):
         g10_currencies = [
@@ -79,4 +79,22 @@ class FinancialData:
                     prices[ind] = 'n/a'
                     prices['p_diff_' + ind] = 'n/a'
             data[currency_pair] = prices
-        return data
+        return self.round_floats_in_dict(data)
+
+    def round_floats_in_dict(self, input_dict):
+        def round_float(value):
+            if isinstance(value, float):
+                return round(value, 2)
+            return value
+
+        rounded_dict = {}
+        for key, value in input_dict.items():
+            if isinstance(value, dict):
+                rounded_dict[key] = {k: round_float(v) for k, v in value.items()}
+            else:
+                rounded_dict[key] = round_float(value)
+
+        return rounded_dict
+
+
+

@@ -5,13 +5,12 @@ class FinancialData:
     def __init__(self):
         pass
 
-
     def get_equity_data(self, indices):
         data = {}
         for index in indices:
             prices = {}
             equity = yf.Ticker(index)
-            today = datetime.today().date() - timedelta(days=2)
+            today = datetime.today().date() - timedelta(days=1)
             yesterday = today - timedelta(days=1)
             week = today - timedelta(days=7)
             month = today - timedelta(days=30)
@@ -19,26 +18,21 @@ class FinancialData:
             year = today - timedelta(days=365)
             days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "six_months": six_months,
                     "year": year}
-            if index != "^VIX":
-                historical_data = equity.history(period="2y", interval="1d")
-                for ind, day in days.items():
+            historical_data = equity.history(period="2y", interval="1d")
+            for ind, day in days.items():
+                errors = 0
+                while day <= today and errors < 5:
                     try:
-                        closing = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
-                        prices[ind] = round(historical_data.loc[day.strftime('%Y-%m-%d')]['Close'], 2)
+                        if day == today:
+                            prices[ind] = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
+                        else:
+                            closing = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
+                            day_price = round(historical_data.loc[day.strftime('%Y-%m-%d')]['Close'], 2)
+                            prices['p_diff_' + ind] = round(((closing - day_price) / day_price) * 100, 2)
+                        break
                     except Exception as e:
-                        prices[ind] = 'n/a'
-                        prices['p_diff_' + ind] = 'n/a'
-                        print(index, e)
-            else:
-                historical_data = equity.history(period="2y", interval="1d")
-                for ind, day in days.items():
-                    try:
-                        closing = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
-                        prices[ind] = round(historical_data.loc[day.strftime('%Y-%m-%d')]['Close'], 2)
-                        prices['p_diff_' + ind] = round(((closing - prices[ind]) / prices[ind]) * 100, 2)
-                    except:
-                        prices[ind] = 'n/a'
-                        prices['p_diff_' + ind] = 'n/a'
+                        day-=timedelta(days=1)
+                        errors+=1
             data[index] = prices
         return self.round_floats_in_dict(data)
 
@@ -58,7 +52,7 @@ class FinancialData:
             "RUBUSD=X",
             "INRUSD=X",
         ]
-        today = datetime.today().date()
+        today = datetime.today().date() - timedelta(days=1)
         yesterday = today - timedelta(days=1)
         week = today - timedelta(days=7)
         month = today - timedelta(days=30)
@@ -69,17 +63,19 @@ class FinancialData:
         data = {}
         for currency_pair in g10_currencies:
             prices = {}
-            historical_data = yf.download(currency_pair, period="1y", interval="1d")
+            historical_data = yf.download(currency_pair, period="2y", interval="1d")
             for ind, day in days.items():
                 try:
-                    closing = historical_data['Close'].loc[str(today)]
-                    prices[ind] = historical_data['Close'].loc[str(day)]
-                    prices['p_diff_' + ind] = ((closing - prices[ind]) / prices[ind]) * 100
-                    prices[ind] = prices[ind]
+                    if day == today:
+                        prices[ind] = historical_data['Close'].loc[str(today)]
+                    else:
+                        closing = historical_data['Close'].loc[str(today)]
+                        day_price = historical_data['Close'].loc[str(day)]
+                        prices['p_diff_' + ind] = ((closing - day_price) / day_price) 
                 except:
-                    prices[ind] = 'n/a'
-                    prices['p_diff_' + ind] = 'n/a'
+                    pass
             data[currency_pair] = prices
+        print(data)
         return self.round_floats_in_dict(data)
 
     def round_floats_in_dict(self, input_dict):

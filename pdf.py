@@ -18,13 +18,13 @@ class PDF:
     
     def reset(self):
 
-        self.pdf.set_font("Arial", size=12)
+        self.pdf.set_font("Arial", size=7)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
         
     def create_header(self, header):
-        self.pdf.set_font("Arial", 'B', 16)
-        self.pdf.cell(0, 10, header, ln=True, align='C')
+        self.pdf.set_font("Arial", 'B', 12)
+        self.pdf.cell(0, 5, header, ln=True, align='C')
         self.pdf.ln(10)
         self.reset()
         
@@ -32,19 +32,61 @@ class PDF:
         first_inner_dict_key = list(data.keys())[0]
         first_inner_dict = data[first_inner_dict_key]
         columns = list(first_inner_dict.keys())
-
-        column_widths = [self.pdf.get_string_width(str(col)) + 10 for col in columns]
+        column_widths = [max([self.pdf.get_string_width(str(col)) + 10 for col in columns]) for col in columns]
 
         self.pdf.cell(column_widths[0], 5, txt='', border=0)
+        equity_mapping = {
+            "SPY": "S&P 500 ETF",
+            "^IXIC": "Nasdaq Composite",
+            "^DJI": "Dow Jones Industrial Average",
+            "^VIX": "CBOE Volatility Index",
+            'HBM': 'Hudbay Minerals Inc.',
+            'L': 'Loews Corporation',
+            'APO': 'Apollo Global Management, Inc.',
+            'MA': 'Mastercard Incorporated',
+            'AAPL': 'Apple Inc.',
+            'EA': 'Electronic Arts Inc.',
+            'TEX': 'Terex Corporation',
+            'CEG': 'Centrais Elétricas de Goiás S.A.',
+            'ISRG': 'Intuitive Surgical, Inc.',
+            'GC=F': 'Gold Futures',
+            'SI=F': 'Silver Futures',
+            'PL=F': 'Platinum Futures',
+            'PA=F': 'Palladium Futures',
+            'HG=F': 'Copper Futures',
+            'CL=F': 'Crude Oil Futures',
+            'NG=F': 'Natural Gas Futures',
+            'EURUSD=X': 'Euro (EUR)',
+            'JPYUSD=X': 'Japanese Yen (JPY)',
+            'CADUSD=X': 'Canadian Dollar (CAD)',
+            'AUDUSD=X': 'Australian Dollar (AUD)',
+            'CNYUSD=X': 'Chinese Yuan (CNY)',
+            'MXNUSD=X': 'Mexican Peso (MXN)',
+            'CLPUSD=X': 'Chilean Peso (CLP)',
+            'BRLUSD=X': 'Brazilian Real (BRL)',
+            'ARSUSD=X': 'Argentine Peso (ARS)',
+            'CHFUSD=X': 'Swiss Franc (CHF)',
+            'TRYUSD=X': 'Turkish Lira (TRY)',
+            'RUBUSD=X': 'Russian Ruble (RUB)',
+            'INRUSD=X': 'Indian Rupee (INR)',
+        }
+        days_mapping = {
+            "today": "Price",
+            "p_diff_yesterday": "1d",
+            "p_diff_week": "1w",
+            "p_diff_month": "1m",
+            "p_diff_six_months": "6m",
+            "p_diff_year": "1y"
+        }
 
         for index, (width, col) in enumerate(zip(column_widths, columns)):
-            self.pdf.cell(width, 5, txt=col, border=0, align='C')
+            self.pdf.cell(2*width//3, 4, txt=days_mapping[col], border=0, align='C')
         self.pdf.ln()
 
         for key, sub_dict in data.items():
-            self.pdf.cell(column_widths[0], 5, txt=str(key), border=0)
+            self.pdf.cell(column_widths[0], 4, txt=equity_mapping[str(key)], border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
-                self.pdf.cell(width, 4, txt=str(sub_dict[col]), border=0, align='C')
+                self.pdf.cell(2*width//3, 4, txt=str(sub_dict[col]), border=0, align='C')
             self.pdf.ln()
 
 

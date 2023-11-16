@@ -1,5 +1,6 @@
 import yfinance as yf
 from datetime import datetime, timedelta
+from config import AMT_USD
 
 class FinancialData:
     def __init__(self):
@@ -69,10 +70,10 @@ class FinancialData:
                 while day <= today and errors < 5:
                     try:
                         if day == today:
-                            prices[ind] = historical_data['Close'].loc[str(today)]
+                            prices[ind] = AMT_USD * historical_data['Close'].loc[str(today)]
                         else:
-                            closing = historical_data['Close'].loc[str(today)]
-                            day_price = historical_data['Close'].loc[str(day)]
+                            closing = AMT_USD * historical_data['Close'].loc[str(today)]
+                            day_price = AMT_USD * historical_data['Close'].loc[str(day)]
                             prices['p_diff_' + ind] = ((closing - day_price) / day_price) 
                         break
                     except:

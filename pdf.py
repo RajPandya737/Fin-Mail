@@ -6,10 +6,10 @@ class PDF:
     def __init__(self):
         self.pdf = FPDF()
         self.pdf.add_page()
-        self.pdf.set_font("Arial", size=12)
+        self.font_size = 8
+        self.pdf.set_font("Arial", size=self.font_size)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
-        self.font_size = 8
         # pdf.set_fill_color(120, 0, 0)
         # pdf.set_text_color(255, 255, 255)
         # x_position = (pdf.w - page_width) / 2
@@ -24,12 +24,17 @@ class PDF:
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
         
     def create_header(self, header):
-        self.pdf.set_font("Arial", 'B', 12)
-        self.pdf.cell(0, 5, header, ln=True, align='C')
-        self.pdf.ln(10)
+        self.pdf.set_font("Arial", 'B', self.font_size)
+        self.pdf.set_fill_color(200, 200, 200)  
+        self.pdf.rect(10, self.pdf.get_y(), self.pdf.w-20, 4, 'F')  
+        self.pdf.set_text_color(0, 0, 0)
+        self.pdf.ln(1)
+        self.pdf.cell(0, 2, header, ln=True, align='L')
         self.reset()
         
     def create_table(self, data):
+        self.pdf.ln(3)
+
         self.pdf.set_font("Arial", size=self.font_size)
         first_inner_dict_key = list(data.keys())[0]
         first_inner_dict = data[first_inner_dict_key]
@@ -43,13 +48,13 @@ class PDF:
             "^DJI": "Dow Jones Industrial Average",
             "^VIX": "CBOE Volatility Index",
             'HBM': 'Hudbay Minerals Inc.',
-            'L': 'Loews Corporation',
+            'L.TO': 'Loblaw Companies Limited',
             'APO': 'Apollo Global Management, Inc.',
             'MA': 'Mastercard Incorporated',
             'AAPL': 'Apple Inc.',
             'EA': 'Electronic Arts Inc.',
             'TEX': 'Terex Corporation',
-            'CEG': 'Centrais Elétricas de Goiás S.A.',
+            'CEG': 'Constellation Energy Corporation',
             'ISRG': 'Intuitive Surgical, Inc.',
             'GC=F': 'Gold Futures',
             'SI=F': 'Silver Futures',
@@ -89,17 +94,17 @@ class PDF:
             self.pdf.cell(column_widths[0]+5, 4, txt=equity_mapping[str(key)], border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
                 self.pdf.set_text_color(0, 0, 0)
-                txt = str(sub_dict[col])
+                txt = str(abs(sub_dict[col]))
                 if index != 0:
                     val = sub_dict[col]
                     if val < 0:
                         self.pdf.set_text_color(188, 31, 37)
                     elif val > 0:
                         self.pdf.set_text_color(27, 140, 86)
-                    txt+='%'
                 self.pdf.cell(3*width//5, 4, txt=txt, border=0, align='R')
                 self.pdf.set_text_color(0, 0, 0)
-            self.pdf.ln()
+            self.pdf.ln(4)
+        self.pdf.ln(3)
         self.reset()
 
 

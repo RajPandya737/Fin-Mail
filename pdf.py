@@ -9,6 +9,7 @@ class PDF:
         self.pdf.set_font("Arial", size=12)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
+        self.font_size = 8
         # pdf.set_fill_color(120, 0, 0)
         # pdf.set_text_color(255, 255, 255)
         # x_position = (pdf.w - page_width) / 2
@@ -29,12 +30,13 @@ class PDF:
         self.reset()
         
     def create_table(self, data):
+        self.pdf.set_font("Arial", size=self.font_size)
         first_inner_dict_key = list(data.keys())[0]
         first_inner_dict = data[first_inner_dict_key]
         columns = list(first_inner_dict.keys())
         column_widths = [max([self.pdf.get_string_width(str(col)) + 10 for col in columns]) for col in columns]
 
-        self.pdf.cell(column_widths[0], 5, txt='', border=0)
+        self.pdf.cell(column_widths[0]+5, 5, txt='', border=0)
         equity_mapping = {
             "SPY": "S&P 500 ETF",
             "^IXIC": "Nasdaq Composite",
@@ -80,14 +82,25 @@ class PDF:
         }
 
         for index, (width, col) in enumerate(zip(column_widths, columns)):
-            self.pdf.cell(2*width//3, 4, txt=days_mapping[col], border=0, align='C')
+            self.pdf.cell(3*width//5, 4, txt=days_mapping[col], border=0, align='R')
         self.pdf.ln()
 
         for key, sub_dict in data.items():
-            self.pdf.cell(column_widths[0], 4, txt=equity_mapping[str(key)], border=0)
+            self.pdf.cell(column_widths[0]+5, 4, txt=equity_mapping[str(key)], border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
-                self.pdf.cell(2*width//3, 4, txt=str(sub_dict[col]), border=0, align='C')
+                self.pdf.set_text_color(0, 0, 0)
+                txt = str(sub_dict[col])
+                if index != 0:
+                    val = sub_dict[col]
+                    if val < 0:
+                        self.pdf.set_text_color(188, 31, 37)
+                    elif val > 0:
+                        self.pdf.set_text_color(27, 140, 86)
+                    txt+='%'
+                self.pdf.cell(3*width//5, 4, txt=txt, border=0, align='R')
+                self.pdf.set_text_color(0, 0, 0)
             self.pdf.ln()
+        self.reset()
 
 
     def save(self):

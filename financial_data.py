@@ -34,7 +34,7 @@ class FinancialData:
                         day-=timedelta(days=1)
                         errors+=1
             data[index] = prices
-        return self.round_floats_in_dict(data)
+        return self.round_floats_in_dict(data, 0)
 
     def get_currency_data(self):
         g10_currencies = [
@@ -65,23 +65,27 @@ class FinancialData:
             prices = {}
             historical_data = yf.download(currency_pair, period="2y", interval="1d")
             for ind, day in days.items():
-                try:
-                    if day == today:
-                        prices[ind] = historical_data['Close'].loc[str(today)]
-                    else:
-                        closing = historical_data['Close'].loc[str(today)]
-                        day_price = historical_data['Close'].loc[str(day)]
-                        prices['p_diff_' + ind] = ((closing - day_price) / day_price) 
-                except:
-                    pass
+                errors = 0
+                while day <= today and errors < 5:
+                    try:
+                        if day == today:
+                            prices[ind] = historical_data['Close'].loc[str(today)]
+                        else:
+                            closing = historical_data['Close'].loc[str(today)]
+                            day_price = historical_data['Close'].loc[str(day)]
+                            prices['p_diff_' + ind] = ((closing - day_price) / day_price) 
+                        break
+                    except:
+                        day-=timedelta(days=1)
+                        errors+=1
             data[currency_pair] = prices
         print(data)
-        return self.round_floats_in_dict(data)
+        return self.round_floats_in_dict(data, 2)
 
-    def round_floats_in_dict(self, input_dict):
+    def round_floats_in_dict(self, input_dict, num_decimals=2):
         def round_float(value):
             if isinstance(value, float):
-                return round(value, 2)
+                return round(value, num_decimals)
             return value
 
         rounded_dict = {}

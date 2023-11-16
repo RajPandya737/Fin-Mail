@@ -37,8 +37,9 @@ print(e)
 pdf.create_table(e)
 
 pdf.create_header("Currency")
-
-pdf.create_table(data.get_currency_data())
+m = data.get_currency_data()
+print(m)
+pdf.create_table(m)
 
 pdf.save()
 

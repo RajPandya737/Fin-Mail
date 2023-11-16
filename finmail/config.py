@@ -1,0 +1,3 @@
+AMT_USD = 1
+COL_WIDTH = 3/7
+OFFSET = 0

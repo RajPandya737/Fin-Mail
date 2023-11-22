@@ -45,7 +45,7 @@ def email_pdf(to_email, pdf_file_path):
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = to_email
-    msg['Subject'] = "Subject of the email"
+    msg['Subject'] = "Daily Market Report"
 
     # Attach the PDF file
     with open(pdf_file_path, "rb") as file:
@@ -63,7 +63,7 @@ def email_pdf(to_email, pdf_file_path):
 
     print(f"Email sent successfully to {to_email}!")
 
-schedule.every(1).day.do(retireve_pdf)
+schedule.every(10).seconds.do(retireve_pdf)
 
 while True:
     schedule.run_pending()

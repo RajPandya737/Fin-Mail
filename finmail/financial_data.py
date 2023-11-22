@@ -43,21 +43,25 @@ class FinancialData:
 
     def get_currency_data(self):
         g10_currencies = [
-            "USDEUR=X",
-            "USDGBP=X",
-            "USDJPY=X",
-            "USDCAD=X",
-            "USDAUD=X",
+            "AUDUSD=X",
+            "CADUSD=X",
+            "EURUSD=X",
+            "JPYUSD=X",
+            "NZDUSD=X",
+            "NOKUSD=X",
+            "GBPUSD=X",
+            "SEKUSD=X",
+            "CHFUSD=X",
+        ]
+        other = [
             "USDCNY=X",
             "USDMXN=X",
             "USDCLP=X",
             "USDBRL=X",
             "USDARS=X",
-            "USDCHF=X",
-            "USDTRY=X",
-            "USDRUB=X",
             "USDINR=X",
-            "USDSEK=X",
+            "RUBUSD=X",
+
         ]
         today = datetime.today().date() - timedelta(days=OFFSET)
         yesterday = today - timedelta(days=1)

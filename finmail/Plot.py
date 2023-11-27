@@ -5,16 +5,20 @@ class Plot:
     def __init__(self):
         pass
     
-    def plot(self, x, y, title=None, xlabel=" ", ylabel="m", color1="tab:red", linewidth=3.0, label="None"):
+    def plot(self, x, y, title=None, xlabel="x-axis", ylabel="y-axis", color1="tab:red", linewidth=3.0, label="None"):
         plt.plot(x, y, color=color1, linewidth=linewidth, label=label)
         plt.title(title)
-        plt.xlabel(xlabel)
+        plt.xlabel(xlabel)  # Corrected line
         plt.ylabel(ylabel)
-        plt.legend()
+        plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.3), fancybox=True, shadow=True, ncol=1, frameon=False)
         plt.gca().set_aspect(0.8)
         plt.gca().spines['right'].set_visible(False)
         plt.gca().spines['top'].set_visible(False)
+        plt.savefig('fig.png')
         plt.show()
+    
+        
+
         
         
 

@@ -6,6 +6,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+from excel import Excel
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
@@ -18,23 +19,46 @@ def retireve_pdf():
     data = FinancialData()
 
     pdf = PDF()
+    excel = Excel()
+    equity_data = data.get_equity_data(equity)
     pdf.create_header("Equity")
-    pdf.create_table(data.get_equity_data(equity))
+    pdf.create_table(equity_data)
+    excel.add_data("Equity", equity_data)
+    
+    treasury_data = data.get_equity_data(treasury)
     pdf.create_header("US Treasury Yields")
-    pdf.create_table(data.get_equity_data(treasury))
+    pdf.create_table(treasury_data)
+    excel.add_data("US Treasury Yields", treasury_data)
+    
+    stocks_data = data.get_equity_data(stocks)
     pdf.create_header("Stocks")
-    pdf.create_table(data.get_equity_data(stocks))
+    pdf.create_table(stocks_data)
+    excel.add_data("Stocks", stocks_data)
+    
+    resources_data = data.get_equity_data(resources)
     pdf.create_header("Resources")
-    pdf.create_table(data.get_equity_data(resources))
+    pdf.create_table(resources_data)
+    excel.add_data("Resources", resources_data)
+    
+    commodities_data = data.get_equity_data(commodities)
     pdf.create_header("Commodities")
-    pdf.create_table(data.get_equity_data(commodities))
+    pdf.create_table(commodities_data)
+    excel.add_data("Commodities", commodities_data)
+    
+    currency_data = data.get_currency_data()
     pdf.create_header("Currency (USD)")
-    pdf.create_table(data.get_currency_data())
+    pdf.create_table(currency_data)
+    excel.add_data("Currency (USD)", currency_data)
+    
+    # pdf.add_image("fig.png", 0,0)
 
+    excel.save()
 
     pdf.save('output')
     
 
+    
+# not tested yet
 def email_pdf(to_email, pdf_file_path):
     retireve_pdf()
     # Set your email credentials
@@ -63,9 +87,15 @@ def email_pdf(to_email, pdf_file_path):
 
     print(f"Email sent successfully to {to_email}!")
 
-schedule.every(10).seconds.do(retireve_pdf)
+def run():
+    schedule.every(10).seconds.do(retireve_pdf)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
+
+def test():
+    retireve_pdf()
+
+test()

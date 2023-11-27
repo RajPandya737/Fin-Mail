@@ -117,6 +117,9 @@ class PDF:
             if number.is_integer():
                 return int(number)
         return number
+    
+    def add_image(self, image_path, x, y):
+        self.pdf.image(image_path, w=self.page_width//2, h=self.page_height//2)
 
 
     def save(self, filename):

@@ -2,9 +2,12 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from config import AMT_USD, OFFSET, YEARS
 
+from collections import defaultdict
+
 class FinancialData:
     def __init__(self):
         pass
+        self.daily_data = defaultdict(list)
 
     def get_equity_data(self, indices):
         data = {}
@@ -24,6 +27,7 @@ class FinancialData:
             days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "three_months": three_months,
                 "six_months": six_months, "year_to_date": ytd, "year": year, "five_year": five_year}
             historical_data = equity.history(period=f"{YEARS}y", interval="1d")
+            self.daily_data[index] = historical_data['Close'].to_list()
             for ind, day in days.items():
                 errors = 0
                 while day <= today and errors < 5:

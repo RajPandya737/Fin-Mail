@@ -7,13 +7,14 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from excel import Excel
+from plot import Plot
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
     stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "CEG", "ISRG"]
     resources = ["GC=F", "SI=F", "PL=F", "PA=F", "HG=F"]
-    commodities = ["CL=F", "GC=F", "NG=F"]
     treasury = ["^IRX", "^FVX", "^TNX", "^TYX"]
+    commodities = ["CL=F", "GC=F", "NG=F"]
 
 
     data = FinancialData()
@@ -50,12 +51,16 @@ def retireve_pdf():
     pdf.create_table(currency_data)
     excel.add_data("Currency (USD)", currency_data)
     
-    # pdf.add_image("fig.png", 0,0)
+    P = Plot()
+    print(data.daily_data)
+    P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price")
+    
+    pdf.add_image("fig.png", 0,0)
 
     excel.save()
 
     pdf.save('output')
-    
+
 
     
 # not tested yet

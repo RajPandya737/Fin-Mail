@@ -1,5 +1,6 @@
 from fpdf import FPDF
 from config import COL_WIDTH, FONT_SIZE
+from PIL import Image
 
 
 class PDF:
@@ -119,7 +120,12 @@ class PDF:
         return number
     
     def add_image(self, image_path, x, y):
-        self.pdf.image(image_path, w=self.page_width//2, h=self.page_height//2)
+        image_path = image_path
+        image = Image.open(image_path)
+
+        # Get the dimensions (width x height) of the image
+        width, height = image.size
+        self.pdf.image(image_path, w=width//10, h=height//10)
 
 
     def save(self, filename):

@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from excel import Excel
 from plot import Plot
+from config import DARK_RED
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
@@ -52,10 +53,14 @@ def retireve_pdf():
     excel.add_data("Currency (USD)", currency_data)
     
     P = Plot()
-    print(data.daily_data)
-    P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price")
+    P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="SPY Price", name='SPY')
+    P.reset_plot()
+    pdf.add_image("SPY.png", 0,0)
     
-    pdf.add_image("fig.png", 0,0)
+    
+    P.plot(data.daily_data["HBM"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="HBM Price", name='HBM')
+    pdf.add_image("HBM.png", 0,0)
+
 
     excel.save()
 

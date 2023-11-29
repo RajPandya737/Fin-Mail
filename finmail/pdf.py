@@ -1,5 +1,5 @@
 from fpdf import FPDF
-from config import COL_WIDTH, FONT_SIZE
+from config import COL_WIDTH, FONT_SIZE, IMAGE_RATIO
 from PIL import Image
 
 
@@ -125,7 +125,7 @@ class PDF:
 
         # Get the dimensions (width x height) of the image
         width, height = image.size
-        self.pdf.image(image_path, w=width//10, h=height//10)
+        self.pdf.image(image_path, w=width*IMAGE_RATIO, h=height*IMAGE_RATIO)
 
 
     def save(self, filename):

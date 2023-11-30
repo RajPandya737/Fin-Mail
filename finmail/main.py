@@ -53,20 +53,33 @@ def retireve_pdf():
     excel.add_data("Currency (USD)", currency_data)
     
     P = Plot()
-    P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="SPY Price", name='SPY')
-    P.reset_plot()
-    pdf.add_image("SPY.png", 0,0)
+    add_plot(P, "SPY", "S&P 500 ETF", data, pdf)
+    add_plot(P, "HBM", "Hudbay Minerals", data, pdf)
+    add_plot(P, "AAPL", "Apple", data, pdf)
+    add_plot(P, "GC=F", "Gold Futures", data, pdf)
+
+
+    # P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="SPY Price", name='SPY')
+    # P.reset_plot()
+    # pdf.add_image("SPY.png", 0,0)
     
     
-    P.plot(data.daily_data["HBM"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="HBM Price", name='HBM')
-    pdf.add_image("HBM.png", 0,0)
+    # P.plot(data.daily_data["HBM"], num_years=5, title="HBM Price", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="HBM Price", name='HBM')
+    # pdf.add_image("HBM.png", 0,0)
+    # P.reset_plot()
+    # P.plot(data.daily_data["AAPL"], num_years=5, title="AAPL Price", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="AAPL Price", name='AAPL')
+
+    # pdf.add_image("AAPL.png", 0,0)
+
 
 
     excel.save()
-
     pdf.save('output')
 
-
+def add_plot(P, ticker, name, data, pdf):
+    P.plot(data.daily_data[ticker], num_years=5, title=f"{name}", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label=f"{ticker} Price", name=name)
+    P.reset_plot()
+    pdf.add_image(f"{name}.png", 0,0)
     
 # not tested yet
 def email_pdf(to_email, pdf_file_path):

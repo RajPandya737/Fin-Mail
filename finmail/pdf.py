@@ -1,5 +1,5 @@
 from fpdf import FPDF
-from config import COL_WIDTH, FONT_SIZE, IMAGE_RATIO
+from config import COL_WIDTH, FONT_SIZE, IMAGE_RATIO, IMAGE_OFFSET
 from PIL import Image
 
 
@@ -11,6 +11,9 @@ class PDF:
         self.pdf.set_font("Arial", size=self.font_size)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
+        self.image_x = IMAGE_OFFSET
+        self.image_y = 0
+        self.added_images = False
 
     
     def reset(self):
@@ -125,7 +128,20 @@ class PDF:
 
         # Get the dimensions (width x height) of the image
         width, height = image.size
-        self.pdf.image(image_path, w=width*IMAGE_RATIO, h=height*IMAGE_RATIO)
+        if self.added_images is False:
+            self.image_y = self.pdf.get_y()
+            self.added_images = True
+        
+        if self.image_x + width*IMAGE_RATIO+2 >= self.page_width:
+            self.image_x = IMAGE_OFFSET
+            self.image_y += height*IMAGE_RATIO
+        if self.image_y + height*IMAGE_RATIO >= self.page_height:
+            self.pdf.add_page()
+            self.image_x = IMAGE_OFFSET
+            self.image_y = 10
+        self.pdf.image(image_path, w=width*IMAGE_RATIO, h=height*IMAGE_RATIO, x=self.image_x, y=self.image_y)
+        self.image_x += width*IMAGE_RATIO
+        print(self.image_x, self.image_y)
 
 
     def save(self, filename):

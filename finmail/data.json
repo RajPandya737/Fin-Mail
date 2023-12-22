@@ -206959,6 +206959,42 @@
       "BD.CDN.RRB.DQ.YLD": {
         "v": "1.26"
       }
+    },
+    {
+      "d": "2023-12-21",
+      "CDN.AVG.1YTO3Y.AVG": {
+        "v": "3.97"
+      },
+      "CDN.AVG.3YTO5Y.AVG": {
+        "v": "3.30"
+      },
+      "CDN.AVG.5YTO10Y.AVG": {
+        "v": "3.13"
+      },
+      "CDN.AVG.OVER.10.AVG": {
+        "v": "3.01"
+      },
+      "BD.CDN.2YR.DQ.YLD": {
+        "v": "3.94"
+      },
+      "BD.CDN.3YR.DQ.YLD": {
+        "v": "3.73"
+      },
+      "BD.CDN.5YR.DQ.YLD": {
+        "v": "3.23"
+      },
+      "BD.CDN.7YR.DQ.YLD": {
+        "v": "3.14"
+      },
+      "BD.CDN.10YR.DQ.YLD": {
+        "v": "3.11"
+      },
+      "BD.CDN.LONG.DQ.YLD": {
+        "v": "2.97"
+      },
+      "BD.CDN.RRB.DQ.YLD": {
+        "v": "1.34"
+      }
     }
   ]
 }

@@ -12,11 +12,8 @@ class Plot:
     def plot(self, y_data, num_years=5, title=None, xlabel="x-axis", ylabel="y-axis", color1="tab:red", linewidth=3.0, label="None", name='fig'):
         
         start_date = datetime.now() - timedelta(days=len(y_data))
-        date_range = pd.date_range(start=start_date, end=datetime.now(), freq='D')[:-1]
-        # print(len(date_range), len(y_data))
-    
+        date_range = pd.date_range(start=start_date, end=datetime.now(), freq='D')[:-1]    
         data = pd.DataFrame({'Date': date_range, 'Y_Data': y_data})        
-        
         plt.plot(data['Date'], data['Y_Data'], color=color1, linewidth=linewidth, label=label)
 
         plt.xlabel('Date')

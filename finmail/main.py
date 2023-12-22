@@ -2,7 +2,6 @@ from financial_data import FinancialData
 from pdf import PDF
 import schedule
 import time
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
@@ -10,6 +9,15 @@ from excel import Excel
 from plot import Plot
 from config import DARK_RED
 import os
+import dotenv
+from datetime import datetime
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+
+
+dotenv.load_dotenv()
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
@@ -53,26 +61,27 @@ def retireve_pdf():
     excel.add_data("Currency (USD)", currency_data)
     
     us_treasury_data = data.get_equity_data(us_treasury)
+    tips = data.get_us_tips_data()
+    us_treasury_data.update(tips)
+    
+    
     pdf.create_header("US Treasury Yields")
-    pdf.create_table(us_treasury_data)
+    pdf.create_table(us_treasury_data, type="yield")
     excel.add_data("US Treasury Yields", us_treasury_data)
     
+        
     cad_treasury_data = data.get_cad_bond_data()
     pdf.create_header("CAD Treasury Yields")
-    pdf.create_table(cad_treasury_data)
+    pdf.create_table(cad_treasury_data, type="yield")
     excel.add_data("CAD Treasury Yields", cad_treasury_data)
     
-    tips = data.get_us_tips_data()
-    pdf.create_header("TIPS")
-    pdf.create_table(tips)
-    excel.add_data("US TIPS Yields", tips)
     
     
-    # P = Plot()
-    # add_plot(P, "SPY", "S&P 500 ETF", data, pdf)
-    # add_plot(P, "HBM", "Hudbay Minerals", data, pdf)
-    # add_plot(P, "AAPL", "Apple", data, pdf)
-    # add_plot(P, "GC=F", "Gold Futures", data, pdf)
+    P = Plot()
+    add_plot(P, "SPY", "S&P 500 ETF", data, pdf)
+    add_plot(P, "HBM", "Hudbay Minerals", data, pdf)
+    add_plot(P, "AAPL", "Apple", data, pdf)
+    add_plot(P, "GC=F", "Gold Futures", data, pdf)
 
 
     # P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="SPY Price", name='SPY')
@@ -87,8 +96,6 @@ def retireve_pdf():
 
     # pdf.add_image("AAPL.png", 0,0)
 
-
-
     excel.save()
     pdf.save('output')
 
@@ -96,44 +103,61 @@ def add_plot(P, ticker, name, data, pdf):
     P.plot(data.daily_data[ticker], num_years=5, title=f"{name}", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label=f"{ticker} Price", name=name)
     P.reset_plot()
     pdf.add_image(os.path.join('graphs', f"{name}.png"), 0, 0)    
-# not tested yet
-def email_pdf(to_email, pdf_file_path):
-    retireve_pdf()
-    # Set your email credentials
-    sender_email = "your_email@gmail.com"
-    sender_password = "your_email_password"
 
-    # Create the MIME object
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = to_email
-    msg['Subject'] = "Daily Market Report"
-
-    # Attach the PDF file
-    with open(pdf_file_path, "rb") as file:
-        attachment = MIMEApplication(file.read(), _subtype="pdf")
-        attachment.add_header('Content-Disposition', f'attachment; filename="{pdf_file_path}"')
-        msg.attach('output.pdf')
-
-    # Connect to the SMTP server (in this example, using Gmail)
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(sender_email, sender_password)
+def email_pdf():
+    email_sender = "finmaildailyreport@gmail.com"
+    email_password = os.getenv('EMAIL_PASSWORD')
+    email_reciever = "finmaildailyreport@gmail.com"
+    date = datetime.now().strftime("%m/%d/%Y")
+    subject = f"Daily Financial Report for {date}"
+    
+    message = MIMEMultipart()
+    message["From"] = email_sender
+    message["To"] = email_reciever
+    message["Subject"] = subject
+    
+    body = ""
+    message.attach(MIMEText(body, "plain"))
+    
+    pdf_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output.pdf")
+    with open(pdf_attachment_path, "rb") as pdf_file:
+        pdf_attachment = MIMEApplication(pdf_file.read(), _subtype="pdf")
+        pdf_attachment.add_header("Content-Disposition", f"attachment; filename=Daily PDF Report")
+        message.attach(pdf_attachment)
         
-        # Send the email
-        server.sendmail(sender_email, to_email, msg.as_string())
+    excel_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output.xlsx")
+    new_name = "Daily Excel Report"
+    new_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), new_name)
+    os.rename(excel_attachment_path, new_path)
+    excel_attachment_path = new_path
+    with open(excel_attachment_path, "rb") as excel_file:
+        excel_attachment = MIMEApplication(excel_file.read(), _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        excel_attachment.add_header("Content-Disposition", f"attachment; filename={os.path.basename(excel_attachment_path)}")
+        message.attach(excel_attachment)
 
-    print(f"Email sent successfully to {to_email}!")
 
+    smtp_server = "smtp.gmail.com" 
+    smtp_port = 587  
+    smtp_username = email_sender
+    smtp_password = email_password
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()  # Use TLS for security
+        server.login(smtp_username, smtp_password)
+        
+        server.sendmail(email_sender, email_reciever, message.as_string())
+    print("email sent")
+
+    
 def run():
-    schedule.every(10).seconds.do(retireve_pdf)
+    # retireve_pdf()
+    email_pdf()
+
+def main():
+    run()
+    schedule.every(1).daily.do(run)
 
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-
-def test():
-    retireve_pdf()
-
-test()
+main()

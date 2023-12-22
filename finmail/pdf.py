@@ -31,7 +31,7 @@ class PDF:
         self.pdf.cell(0, 2, header, ln=True, align='L')
         self.reset()
         
-    def create_table(self, data):
+    def create_table(self, data, type="dollar"):
         self.pdf.ln(3)
 
         self.pdf.set_font("Arial", size=self.font_size)
@@ -105,6 +105,8 @@ class PDF:
             "p_diff_year": "1y",
             "p_diff_five_year": "5y"
         }
+        if type != "dollar":
+            days_mapping["today"] = "Yield"
 
         for index, (width, col) in enumerate(zip(column_widths, columns)):
             self.pdf.cell(COL_WIDTH*width, 4, txt=days_mapping[col], border=0, align='R')
@@ -115,7 +117,10 @@ class PDF:
             for index, (col, width) in enumerate(zip(columns, column_widths)):
                 self.pdf.set_text_color(0, 0, 0)
                 if index == 0:
-                    txt = "${:.2f}".format(sub_dict[col])
+                    if type == "dollar":
+                        txt = "${:.2f}".format(sub_dict[col])
+                    else:
+                        txt = "{:.2f}%".format(sub_dict[col])
                 else:
                     try:
                         txt = "{:.2f}%".format(abs(sub_dict[col]))

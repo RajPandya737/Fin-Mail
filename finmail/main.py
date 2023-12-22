@@ -9,13 +9,16 @@ from email.mime.application import MIMEApplication
 from excel import Excel
 from plot import Plot
 from config import DARK_RED
+import os
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
     stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "CEG", "ISRG"]
     resources = ["GC=F", "SI=F", "PL=F", "PA=F", "HG=F"]
-    treasury = ["^IRX", "^FVX", "^TNX", "^TYX"]
+    us_treasury = ["^IRX", "^FVX", "^TNX", "^TYX"]
+    #"SHY", "STIP", "IEI", "IEF", "TLT", "SHV", "BIL", "SCHO", "SCHR", "SPSB", "INF-1YR", "INF-10YR"
     commodities = ["CL=F", "GC=F", "NG=F"]
+
 
 
     data = FinancialData()
@@ -23,14 +26,11 @@ def retireve_pdf():
     pdf = PDF()
     excel = Excel()
     equity_data = data.get_equity_data(equity)
+    print(equity_data)
     pdf.create_header("Equity")
     pdf.create_table(equity_data)
     excel.add_data("Equity", equity_data)
     
-    treasury_data = data.get_equity_data(treasury)
-    pdf.create_header("US Treasury Yields")
-    pdf.create_table(treasury_data)
-    excel.add_data("US Treasury Yields", treasury_data)
     
     stocks_data = data.get_equity_data(stocks)
     pdf.create_header("Stocks")
@@ -52,11 +52,27 @@ def retireve_pdf():
     pdf.create_table(currency_data)
     excel.add_data("Currency (USD)", currency_data)
     
-    P = Plot()
-    add_plot(P, "SPY", "S&P 500 ETF", data, pdf)
-    add_plot(P, "HBM", "Hudbay Minerals", data, pdf)
-    add_plot(P, "AAPL", "Apple", data, pdf)
-    add_plot(P, "GC=F", "Gold Futures", data, pdf)
+    us_treasury_data = data.get_equity_data(us_treasury)
+    pdf.create_header("US Treasury Yields")
+    pdf.create_table(us_treasury_data)
+    excel.add_data("US Treasury Yields", us_treasury_data)
+    
+    cad_treasury_data = data.get_cad_bond_data()
+    pdf.create_header("CAD Treasury Yields")
+    pdf.create_table(cad_treasury_data)
+    excel.add_data("CAD Treasury Yields", cad_treasury_data)
+    
+    tips = data.get_us_tips_data()
+    pdf.create_header("TIPS")
+    pdf.create_table(tips)
+    excel.add_data("US TIPS Yields", tips)
+    
+    
+    # P = Plot()
+    # add_plot(P, "SPY", "S&P 500 ETF", data, pdf)
+    # add_plot(P, "HBM", "Hudbay Minerals", data, pdf)
+    # add_plot(P, "AAPL", "Apple", data, pdf)
+    # add_plot(P, "GC=F", "Gold Futures", data, pdf)
 
 
     # P.plot(data.daily_data["SPY"], num_years=5, title="S&P 500 ETF", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label="SPY Price", name='SPY')
@@ -79,8 +95,7 @@ def retireve_pdf():
 def add_plot(P, ticker, name, data, pdf):
     P.plot(data.daily_data[ticker], num_years=5, title=f"{name}", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label=f"{ticker} Price", name=name)
     P.reset_plot()
-    pdf.add_image(f"{name}.png", 0,0)
-    
+    pdf.add_image(os.path.join('graphs', f"{name}.png"), 0, 0)    
 # not tested yet
 def email_pdf(to_email, pdf_file_path):
     retireve_pdf()

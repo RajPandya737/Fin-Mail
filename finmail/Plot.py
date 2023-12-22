@@ -3,6 +3,7 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 import pandas as pd
 from config import DARK_RED
+import os
 
 class Plot:
     def __init__(self):
@@ -30,8 +31,9 @@ class Plot:
         plt.gca().spines['top'].set_visible(False)
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b \'%y'))
         plt.tight_layout()
-        plt.savefig(f'{name}.png', bbox_inches='tight')
-        # plt.show()
+        if not os.path.exists('graphs'):
+            os.makedirs('graphs')
+        plt.savefig(os.path.join('graphs', f'{name}.png'), bbox_inches='tight')
     
     def reset_plot(self):
         plt.clf()

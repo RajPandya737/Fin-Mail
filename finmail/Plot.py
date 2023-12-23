@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 import pandas as pd
-from config import DARK_RED
 import os
 
 class Plot:
@@ -39,11 +38,3 @@ class Plot:
         
 
         
-        
-
-
-x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-y = [2, 4, 6, 8, 10, 2, 4, 6, 8, 10, 2, 4, 6, 8, 10, 2, 4, 6, 8, 10]
-
-# p = Plot()
-# p.plot(x,y, title="Test", xlabel="X", ylabel="Y", color1=DARK_RED)

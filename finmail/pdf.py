@@ -167,5 +167,5 @@ class PDF:
 
 
     def save(self, filename):
-        self.pdf.output(f"{filename}.pdf")
+        self.pdf.output(f"Daily PDF Report.pdf")
     

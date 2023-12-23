@@ -2,9 +2,6 @@ from financial_data import FinancialData
 from pdf import PDF
 import schedule
 import time
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 from excel import Excel
 from plot import Plot
 from config import DARK_RED
@@ -119,17 +116,13 @@ def email_pdf():
     body = ""
     message.attach(MIMEText(body, "plain"))
     
-    pdf_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output.pdf")
+    pdf_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Daily PDF Report.pdf")
     with open(pdf_attachment_path, "rb") as pdf_file:
         pdf_attachment = MIMEApplication(pdf_file.read(), _subtype="pdf")
         pdf_attachment.add_header("Content-Disposition", f"attachment; filename=Daily PDF Report")
         message.attach(pdf_attachment)
         
-    excel_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output.xlsx")
-    new_name = "Daily Excel Report"
-    new_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), new_name)
-    os.rename(excel_attachment_path, new_path)
-    excel_attachment_path = new_path
+    excel_attachment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Daily Excel Report.xlsx")
     with open(excel_attachment_path, "rb") as excel_file:
         excel_attachment = MIMEApplication(excel_file.read(), _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         excel_attachment.add_header("Content-Disposition", f"attachment; filename={os.path.basename(excel_attachment_path)}")
@@ -149,12 +142,15 @@ def email_pdf():
 
     
 def run():
-    # retireve_pdf()
-    email_pdf()
+    try:
+        retireve_pdf()
+        email_pdf()
+    except Exception as e:
+        print(e)
 
 def main():
     run()
-    schedule.every(1).daily.do(run)
+    schedule.every(1).day.do(run)
 
     while True:
         schedule.run_pending()

@@ -90,7 +90,7 @@ class Excel:
         list_of_dfs = [pd.DataFrame(d) for d in self.data]
         result_df = pd.concat(list_of_dfs, axis=1).transpose()
 
-        with pd.ExcelWriter('output.xlsx', engine='xlsxwriter') as writer:
+        with pd.ExcelWriter('Daily Excel Report.xlsx', engine='xlsxwriter') as writer:
             result_df.to_excel(writer, index_label='Row')
 
             # Access the XlsxWriter workbook and worksheet objects

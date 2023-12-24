@@ -1,6 +1,7 @@
 from fpdf import FPDF
 from config import COL_WIDTH, FONT_SIZE, IMAGE_RATIO, IMAGE_OFFSET
 from PIL import Image
+from math import isnan
 
 
 class PDF:
@@ -8,7 +9,7 @@ class PDF:
         self.pdf = FPDF()
         self.pdf.add_page()
         self.font_size = FONT_SIZE
-        self.pdf.set_font("Arial", size=self.font_size)
+        self.pdf.set_font("helvetica", size=self.font_size)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
         self.image_x = IMAGE_OFFSET
@@ -18,12 +19,12 @@ class PDF:
     
     def reset(self):
 
-        self.pdf.set_font("Arial", size=self.font_size)
+        self.pdf.set_font("helvetica", size=self.font_size)
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
         
     def create_header(self, header):
-        self.pdf.set_font("Arial", 'B', self.font_size)
+        self.pdf.set_font("helvetica", 'B', self.font_size)
         self.pdf.set_fill_color(220, 220, 220)  
         self.pdf.rect(10, self.pdf.get_y(), self.pdf.w-20, 4, 'F')  
         self.pdf.set_text_color(0, 0, 0)
@@ -34,7 +35,7 @@ class PDF:
     def create_table(self, data, type="dollar"):
         self.pdf.ln(3)
 
-        self.pdf.set_font("Arial", size=self.font_size)
+        self.pdf.set_font("helvetica", size=self.font_size)
         first_inner_dict_key = list(data.keys())[0]
         first_inner_dict = data[first_inner_dict_key]
         columns = list(first_inner_dict.keys())
@@ -113,20 +114,26 @@ class PDF:
         self.pdf.ln()
         print(data)
         for key, sub_dict in data.items():
+            print(key)
             self.pdf.cell(column_widths[0]+5, 4, txt=equity_mapping[str(key)], border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
                 self.pdf.set_text_color(0, 0, 0)
-                if index == 0:
+                num = sub_dict[col]
+                
+                if isnan(num) or num == 0:
+                    txt = "-"
+                    val = 0
+                elif index == 0:
                     if type == "dollar":
-                        txt = "${:.2f}".format(sub_dict[col])
+                        txt = "${:.2f}".format(num)
                     else:
-                        txt = "{:.2f}%".format(sub_dict[col])
+                        txt = "{:.2f}%".format(num)
                 else:
                     try:
-                        txt = "{:.2f}%".format(abs(sub_dict[col]))
-                        val = sub_dict[col]
+                        txt = "{:.2f}%".format(abs(num))
+                        val = num
                     except KeyError:
-                        txt = "n/a"
+                        txt = "-"
                         val = 0
                     if val < 0:
                         self.pdf.set_text_color(188, 31, 37)

@@ -4,7 +4,7 @@ import schedule
 import time
 from excel import Excel
 from plot import Plot
-from config import DARK_RED
+from config import DARK_RED, OFFSET
 import os
 import dotenv
 from datetime import datetime
@@ -18,7 +18,7 @@ dotenv.load_dotenv()
 
 def retireve_pdf():
     equity = ["SPY","^IXIC","^DJI", "^VIX"]
-    stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "CEG", "ISRG"]
+    stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "ISRG", "CEG"]
     resources = ["GC=F", "SI=F", "PL=F", "PA=F", "HG=F"]
     us_treasury = ["^IRX", "^FVX", "^TNX", "^TYX"]
     #"SHY", "STIP", "IEI", "IEF", "TLT", "SHV", "BIL", "SCHO", "SCHR", "SPSB", "INF-1YR", "INF-10YR"
@@ -38,6 +38,9 @@ def retireve_pdf():
     
     
     stocks_data = data.get_equity_data(stocks)
+    stocks_data["CEG"]['p_diff_five_year'] = 0
+    print(stocks_data)
+    print(stocks_data["CEG"]['p_diff_five_year'])
     pdf.create_header("Stocks")
     pdf.create_table(stocks_data)
     excel.add_data("Stocks", stocks_data)
@@ -65,6 +68,7 @@ def retireve_pdf():
     pdf.create_header("US Treasury Yields")
     pdf.create_table(us_treasury_data, type="yield")
     excel.add_data("US Treasury Yields", us_treasury_data)
+    
     
         
     cad_treasury_data = data.get_cad_bond_data()
@@ -127,8 +131,6 @@ def email_pdf():
         excel_attachment = MIMEApplication(excel_file.read(), _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         excel_attachment.add_header("Content-Disposition", f"attachment; filename={os.path.basename(excel_attachment_path)}")
         message.attach(excel_attachment)
-
-
     smtp_server = "smtp.gmail.com" 
     smtp_port = 587  
     smtp_username = email_sender
@@ -148,9 +150,9 @@ def run():
     except Exception as e:
         print(e)
 
-def main():
-    run()
-    schedule.every(1).day.do(run)
+def main(): 
+
+    schedule.every(20).seconds.do(run) 
 
     while True:
         schedule.run_pending()

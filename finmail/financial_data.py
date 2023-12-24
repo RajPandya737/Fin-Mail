@@ -13,6 +13,7 @@ load_dotenv()
 
 class FinancialData:
     def __init__(self):
+        print(OFFSET)
         pass
         self.daily_data = defaultdict(list)
         api_key = os.getenv('API_KEY')
@@ -163,6 +164,8 @@ class FinancialData:
                     except:
                         day-=timedelta(days=1)
                         errors+=1
+                if errors >= 5:
+                    prices['p_diff_' + ind] = 0
             data[currency_pair] = prices
         print(data)
         return self.round_floats_in_dict(data, 2)

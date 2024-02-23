@@ -3,7 +3,7 @@ from pdf import PDF
 import schedule
 import time
 from excel import Excel
-from plot import Plot
+from Plot import Plot
 from config import DARK_RED, OFFSET
 import os
 import dotenv

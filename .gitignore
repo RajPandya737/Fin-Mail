@@ -196,3 +196,5 @@ pyrightconfig.json
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,dotenv
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,dotenv
+
+/finmail/dfic_holdings.json

@@ -169,6 +169,13 @@ class FinancialData:
             data[currency_pair] = prices
         print(data)
         return self.round_floats_in_dict(data, 2)
+    
+    def calculate_portfolio(self):
+        with open('dfic_holdings.json', 'r') as file:
+            data_dict = json.load(file)
+        equities = ["SPY", "APO","AAPL","CEG","EA","ISRG","MA","TEX","HBM","L.TO",]
+        
+
 
     def round_floats_in_dict(self, input_dict, num_decimals=2):
         def round_float(value):

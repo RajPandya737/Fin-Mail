@@ -104,7 +104,8 @@ class PDF:
             "p_diff_six_months": "6m",
             "p_diff_year_to_date": "Ytd",
             "p_diff_year": "1y",
-            "p_diff_five_year": "5y"
+            "p_diff_five_year": "5y",
+            "value": "value"
         }
         if type != "dollar":
             days_mapping["today"] = "Yield"
@@ -112,9 +113,7 @@ class PDF:
         for index, (width, col) in enumerate(zip(column_widths, columns)):
             self.pdf.cell(COL_WIDTH*width, 4, txt=days_mapping[col], border=0, align='R')
         self.pdf.ln()
-        print(data)
         for key, sub_dict in data.items():
-            print(key)
             self.pdf.cell(column_widths[0]+5, 4, txt=equity_mapping[str(key)], border=0)
             for index, (col, width) in enumerate(zip(columns, column_widths)):
                 self.pdf.set_text_color(0, 0, 0)

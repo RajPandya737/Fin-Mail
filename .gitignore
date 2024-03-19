@@ -191,10 +191,8 @@ pyrightconfig.json
 .history
 .ionide
 
+finmail/dfic_holdings.json
+Daily PDF Report.pdf
+Daily Excel Report.xlsx
 
-# Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,dotenv
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,dotenv
-
-# End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,dotenv
-
-/finmail/dfic_holdings.json
+```

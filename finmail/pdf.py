@@ -23,16 +23,20 @@ class PDF:
         self.page_width = self.pdf.w - 0.5 * self.pdf.l_margin
         self.page_height = self.pdf.h - 0.5 * self.pdf.t_margin
         
-    def create_header(self, header):
+    def create_header(self, header, align='L', back=True):
         self.pdf.set_font("helvetica", 'B', self.font_size)
-        self.pdf.set_fill_color(220, 220, 220)  
-        self.pdf.rect(10, self.pdf.get_y(), self.pdf.w-20, 4, 'F')  
         self.pdf.set_text_color(0, 0, 0)
         self.pdf.ln(1)
-        self.pdf.cell(0, 2, header, ln=True, align='L')
+        if back:
+            self.pdf.set_fill_color(220, 220, 220)
+        else:
+            self.pdf.set_fill_color(255, 255, 255)
+        self.pdf.rect(10, self.pdf.get_y(), self.pdf.w-20, 4, 'F')
+
+        self.pdf.cell(0, 2, header, ln=True, align=align)
         self.reset()
         
-    def create_table(self, data, type="dollar"):
+    def create_table(self, data, type="dollar", final=False):
         self.pdf.ln(3)
 
         self.pdf.set_font("helvetica", size=self.font_size)
@@ -161,27 +165,25 @@ class PDF:
                 self.pdf.set_text_color(0, 0, 0)
                 num = sub_dict[col]
                 
+                
                 if isnan(num) or num == 0:
                     txt = "-"
                     val = 0
-                elif index == 0:
-                    if type == "dollar":
-                        txt = "${:.2f}".format(num)
-                    else:
-                        txt = "{:.2f}%".format(num)
-                elif index == 0:
-                    if type == "dollar":
-                        txt = "${:.2f}".format(num)
-                    else:
-                        txt = "{:.2f}%".format(num)
+
+                elif index == 0 and type == "dollar":
+                    txt = "${:.2f}".format(num)
+                elif index == 0 and type == "yield":
+                    txt = "{:.2f}%".format(num)
+                # elif index == 8 and type == "dollar":
+                #     txt = "${:,.2f}".format(num)
+                #     val = num
                 else:
                     try:
-                        if index != 8:
-                            txt = "{:.2f}%".format(abs(num))
-                            val = num
+                        if type == "dollar":
+                            txt = "${:,.2f}".format(num)
                         else:
-                            txt = "${:.2f}".format(num)
-                            val = num
+                            txt = "{:.2f}%".format(abs(num))
+                        val = num
                     except KeyError:
                         txt = "-"
                         val = 0

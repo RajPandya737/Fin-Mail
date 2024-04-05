@@ -19,7 +19,7 @@ class FinancialData:
         api_key = os.getenv('API_KEY')
         self.fred = Fred(api_key=api_key)
 
-    def get_equity_data(self, indices):
+    def get_equity_data(self, indices, five=False):
         data = {}
         for index in indices:
             today = datetime.today().date() - timedelta(days=OFFSET)
@@ -35,7 +35,10 @@ class FinancialData:
             prices = {}
             equity = yf.Ticker(index)
             days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "three_months": three_months,
-                "six_months": six_months, "year_to_date": ytd, "year": year,} #"five_year": five_year}
+                "six_months": six_months, "year_to_date": ytd, "year": year,}
+            if five:
+                days['five_year'] = five_year
+
             historical_data = equity.history(period=f"{YEARS}y", interval="1d")
             for ind, day in days.items():
                 errors = 0
@@ -74,7 +77,7 @@ class FinancialData:
             bonds = ["CDN.AVG.1YTO3Y.AVG", "BD.CDN.2YR.DQ.YLD", "BD.CDN.5YR.DQ.YLD", "BD.CDN.10YR.DQ.YLD"]
             bond_data = {}
             for bond in bonds:
-                time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365,} #"five_year": 365 * 5}
+                time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365, "five_year": 365 * 5}
                 time_data = {}
                 for period, days in time_hash.items():
                     target_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -97,7 +100,7 @@ class FinancialData:
         data = {}
         for length in lengths:
             history = self.fred.get_series(length)
-            time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365,} # "five_year": 365 * 5}
+            time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365, "five_year": 365 * 5}
             time_data = {}
             for period, days in time_hash.items():
                 target_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -120,7 +123,7 @@ class FinancialData:
             "CADUSD=X",
             "EURUSD=X",
             "JPYUSD=X",
-            "NZDUSD=X",
+            #"NZDUSD=X",
             "NOKUSD=X",
             "GBPUSD=X",
             "SEKUSD=X",
@@ -146,7 +149,7 @@ class FinancialData:
         five_year = today - timedelta(days=1825)
         ytd = datetime(today.year, 1, 1).date()
         days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "three_months": three_months,
-                "six_months": six_months, "year_to_date": ytd, "year": year,} # "five_year": five_year}
+                "six_months": six_months, "year_to_date": ytd, "year": year, "five_year": five_year}
         data = {}
         for currency_pair in g10_currencies:
             prices = {}

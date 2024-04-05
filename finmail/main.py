@@ -3,7 +3,7 @@ from pdf import PDF
 import schedule
 import time
 from excel import Excel
-from Plot import Plot
+from plot import Plot
 from config import DARK_RED, OFFSET
 import os
 import dotenv
@@ -55,22 +55,22 @@ def retireve_pdf():
 
     total_portfolio = data.calculate_portfolio()
 
-    pdf.create_header("Total Portfolio Value: $" + (f"{total_portfolio:,.2f}" if total_portfolio >= 100000 else f"{total_portfolio:.2f}"))
+    pdf.create_header("Total Portfolio Value: $" + (f"{total_portfolio:,.2f}" if total_portfolio >= 100000 else f"{total_portfolio:.2f}"), align='R', back=False)
 
     pdf.create_header("CAD Portfolio")
-    pdf.create_table(cad_data)
+    pdf.create_table(cad_data, final=True)
     excel.add_data("Equity", cad_data)
 
     pdf.create_header("US Portfolio")
-    pdf.create_table(us_data)
+    pdf.create_table(us_data, final=True)
     excel.add_data("Stocks", us_data)
     
-    resources_data = data.get_equity_data(resources)
+    resources_data = data.get_equity_data(resources, five=True)
     pdf.create_header("Resources")
     pdf.create_table(resources_data)
     excel.add_data("Resources", resources_data)
     
-    commodities_data = data.get_equity_data(commodities)
+    commodities_data = data.get_equity_data(commodities, five=True)
     pdf.create_header("Commodities")
     pdf.create_table(commodities_data)
     excel.add_data("Commodities", commodities_data)
@@ -80,9 +80,9 @@ def retireve_pdf():
     pdf.create_table(currency_data)
     excel.add_data("Currency (USD)", currency_data)
     
-    us_treasury_data = data.get_equity_data(us_treasury)
-    tips = data.get_us_tips_data()
-    us_treasury_data.update(tips)
+    us_treasury_data = data.get_equity_data(us_treasury, five=True)
+    # tips = data.get_us_tips_data()
+    # us_treasury_data.update(tips)
     
     
     pdf.create_header("US Treasury Yields")

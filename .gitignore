@@ -194,5 +194,6 @@ pyrightconfig.json
 finmail/dfic_holdings.json
 Daily PDF Report.pdf
 Daily Excel Report.xlsx
+test.py
 
 ```

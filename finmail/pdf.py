@@ -42,7 +42,49 @@ class PDF:
         column_widths = [max([self.pdf.get_string_width(str(col)) + 10 for col in columns]) for col in columns]
 
         self.pdf.cell(column_widths[0]+5, 5, txt='', border=0)
+
+        ticker_to_name = {
+            "XIU.TO": "iShares S&P/TSX 60",
+            "XBB.TO": "iShares Core Canadian Bond",
+            "HBM": "Hudbay Minerals",
+            "L.TO": "Loblaw",
+            "WFG.TO": "West Fraser Timber",
+            "CSH-UN.TO": "iShares S&P/TSX Capped Financials",
+            "AGG": "iShares Core U.S. Aggregate",
+            "SPY": "SPDR S&P 500",
+            "APO": "Apollo Global Management",
+            "AAPL": "Apple",
+            "CEG": "Centennial Resource Development",
+            "EA": "Electronic Arts",
+            "ISRG": "Intuitive Surgical",
+            "MA": "Mastercard",
+            "TEX": "Terex",
+            "AMSF": "AMERISAFE",
+            "VEEV": "Veeva Systems",
+            "GSL": "Global Ship Lease",
+            "SPSB": "SPSB"
+        }
+
         equity_mapping = {
+            "XIU.TO": "iShares S&P/TSX 60",
+            "XBB.TO": "iShares Core Canadian Bond",
+            "HBM": "Hudbay Minerals",
+            "L.TO": "Loblaw",
+            "WFG.TO": "West Fraser Timber",
+            "CSH-UN.TO": "iShares S&P/TSX Capped",
+            "AGG": "iShares Core U.S. Aggregate",
+            "SPY": "SPDR S&P 500",
+            "APO": "Apollo Global Management",
+            "AAPL": "Apple",
+            "CEG": "Centennial Resource Development",
+            "EA": "Electronic Arts",
+            "ISRG": "Intuitive Surgical",
+            "MA": "Mastercard",
+            "TEX": "Terex",
+            "AMSF": "AMERISAFE",
+            "VEEV": "Veeva Systems",
+            "GSL": "Global Ship Lease",
+            "SPSB": "SPSB",
             "SPY": "S&P 500 ETF",
             "^IXIC": "Nasdaq Composite",
             "^DJI": "Dow Jones Industrial Average",
@@ -105,7 +147,7 @@ class PDF:
             "p_diff_year_to_date": "Ytd",
             "p_diff_year": "1y",
             "p_diff_five_year": "5y",
-            "value": "value"
+            "value": "Value"
         }
         if type != "dollar":
             days_mapping["today"] = "Yield"
@@ -127,10 +169,19 @@ class PDF:
                         txt = "${:.2f}".format(num)
                     else:
                         txt = "{:.2f}%".format(num)
+                elif index == 0:
+                    if type == "dollar":
+                        txt = "${:.2f}".format(num)
+                    else:
+                        txt = "{:.2f}%".format(num)
                 else:
                     try:
-                        txt = "{:.2f}%".format(abs(num))
-                        val = num
+                        if index != 8:
+                            txt = "{:.2f}%".format(abs(num))
+                            val = num
+                        else:
+                            txt = "${:.2f}".format(num)
+                            val = num
                     except KeyError:
                         txt = "-"
                         val = 0

@@ -15,7 +15,7 @@ class FinancialData:
     def __init__(self):
         print(OFFSET)
         pass
-        self.daily_data = defaultdict(list)
+        self.daily_data = defaultdict()
         api_key = os.getenv('API_KEY')
         self.fred = Fred(api_key=api_key)
 
@@ -35,15 +35,16 @@ class FinancialData:
             prices = {}
             equity = yf.Ticker(index)
             days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "three_months": three_months,
-                "six_months": six_months, "year_to_date": ytd, "year": year, "five_year": five_year}
+                "six_months": six_months, "year_to_date": ytd, "year": year,} #"five_year": five_year}
             historical_data = equity.history(period=f"{YEARS}y", interval="1d")
-            self.daily_data[index] = historical_data['Close'].to_list()
             for ind, day in days.items():
                 errors = 0
                 while day <= today and errors < 5:
                     try:
                         if day == today:
                             prices[ind] = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
+                            self.daily_data[index] = prices[ind]
+
                         else:
                             closing = round(historical_data.loc[today.strftime('%Y-%m-%d')]['Close'], 2)
                             day_price = round(historical_data.loc[day.strftime('%Y-%m-%d')]['Close'], 2)
@@ -73,7 +74,7 @@ class FinancialData:
             bonds = ["CDN.AVG.1YTO3Y.AVG", "BD.CDN.2YR.DQ.YLD", "BD.CDN.5YR.DQ.YLD", "BD.CDN.10YR.DQ.YLD"]
             bond_data = {}
             for bond in bonds:
-                time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365, "five_year": 365 * 5}
+                time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365,} #"five_year": 365 * 5}
                 time_data = {}
                 for period, days in time_hash.items():
                     target_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -96,7 +97,7 @@ class FinancialData:
         data = {}
         for length in lengths:
             history = self.fred.get_series(length)
-            time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365, "five_year": 365 * 5}
+            time_hash = {"today": 0, "yesterday": 1, "week": 7, "month": 30, "three_months": 90, "six_months": 180, "year_to_date": (datetime.now() - datetime(datetime.now().year, 1, 1)).days, "year": 365,} # "five_year": 365 * 5}
             time_data = {}
             for period, days in time_hash.items():
                 target_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -145,7 +146,7 @@ class FinancialData:
         five_year = today - timedelta(days=1825)
         ytd = datetime(today.year, 1, 1).date()
         days = {"today": today, "yesterday": yesterday, "week": week, "month": month, "three_months": three_months,
-                "six_months": six_months, "year_to_date": ytd, "year": year, "five_year": five_year}
+                "six_months": six_months, "year_to_date": ytd, "year": year,} # "five_year": five_year}
         data = {}
         for currency_pair in g10_currencies:
             prices = {}
@@ -173,8 +174,18 @@ class FinancialData:
     def calculate_portfolio(self):
         with open('dfic_holdings.json', 'r') as file:
             data_dict = json.load(file)
-        equities = ["SPY", "APO","AAPL","CEG","EA","ISRG","MA","TEX","HBM","L.TO",]
-        
+
+        value = 0
+        print(self.daily_data)
+        for key in data_dict.keys():
+            value += data_dict[key] * self.daily_data[key]
+
+
+        return value
+        # equities = ["SPY", "APO","AAPL","CEG","EA","ISRG","MA","TEX","HBM","L.TO",]
+    
+    def get_port_price(self, index):
+        return self.daily_data[index]
 
 
     def round_floats_in_dict(self, input_dict, num_decimals=2):

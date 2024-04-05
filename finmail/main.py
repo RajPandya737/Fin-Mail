@@ -18,76 +18,83 @@ import json
 dotenv.load_dotenv()
 
 def retireve_pdf():
-    equity = ["SPY","^IXIC","^DJI", "^VIX"]
-    stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "ISRG", "CEG"]
+    cad_port = ["XIU.TO", "XBB.TO", "HBM", "L.TO", "WFG.TO", "CSH-UN.TO"]
+    us_port = ["AGG", "SPY", "APO", "AAPL", "CEG", "EA", "ISRG", "MA", "TEX", "AMSF", "VEEV", "GSL", "SPSB"]
+    #equity = ["SPY","^IXIC","^DJI", "^VIX"]
+    #stocks = ['HBM', 'L.TO', 'APO', "MA", "AAPL", "EA", "TEX", "ISRG", "CEG"]
     resources = ["GC=F", "SI=F", "PL=F", "PA=F", "HG=F"]
     us_treasury = ["^IRX", "^FVX", "^TNX", "^TYX"]
-    #"SHY", "STIP", "IEI", "IEF", "TLT", "SHV", "BIL", "SCHO", "SCHR", "SPSB", "INF-1YR", "INF-10YR"
     commodities = ["CL=F", "GC=F", "NG=F"]
 
 
 
     data = FinancialData()
 
-    data.calculate_portfolio()
 
     pdf = PDF()
     excel = Excel()
-    equity_data = data.get_equity_data(equity)
-    print(equity_data)
-    pdf.create_header("Equity")
-    pdf.create_table(equity_data)
-    excel.add_data("Equity", equity_data)
+    cad_data = data.get_equity_data(cad_port)
+    print(cad_data)
+
     
     
-    stocks_data = data.get_equity_data(stocks)
-    stocks_data["CEG"]['p_diff_five_year'] = 0
-    print(stocks_data)
+    us_data = data.get_equity_data(us_port)
+    #stocks_data["CEG"]['p_diff_five_year'] = 0
+
+    days = 4
+
     with open(os.path.join(os.getcwd(), 'dfic_holdings.json'), 'r') as file:
         data_dict = json.load(file)
-    for key in stocks_data:
-        if key in ["SPY", "APO","AAPL","CEG","EA","ISRG","MA","TEX","HBM","L.TO",]:
-            stocks_data[key]['value'] = round(data_dict[key] + (data_dict[key] * stocks_data[key]['p_diff_yesterday']/100), 2)
-        else:
-            stocks_data[key]['value'] = 0
 
-    print(stocks_data)
+    for key in cad_data:
+        cad_data[key]['value'] = round(data_dict[key] * data.get_port_price(key), 2)
+
+    for key in us_data:
+        us_data[key]['value'] = round(data_dict[key] * data.get_port_price(key), 2)
 
 
-    pdf.create_header("Stocks")
-    pdf.create_table(stocks_data)
-    # excel.add_data("Stocks", stocks_data)
+    total_portfolio = data.calculate_portfolio()
+
+    pdf.create_header("Total Portfolio Value: $" + (f"{total_portfolio:,.2f}" if total_portfolio >= 100000 else f"{total_portfolio:.2f}"))
+
+    pdf.create_header("CAD Portfolio")
+    pdf.create_table(cad_data)
+    excel.add_data("Equity", cad_data)
+
+    pdf.create_header("US Portfolio")
+    pdf.create_table(us_data)
+    excel.add_data("Stocks", us_data)
     
-    # resources_data = data.get_equity_data(resources)
-    # pdf.create_header("Resources")
-    # pdf.create_table(resources_data)
-    # excel.add_data("Resources", resources_data)
+    resources_data = data.get_equity_data(resources)
+    pdf.create_header("Resources")
+    pdf.create_table(resources_data)
+    excel.add_data("Resources", resources_data)
     
-    # commodities_data = data.get_equity_data(commodities)
-    # pdf.create_header("Commodities")
-    # pdf.create_table(commodities_data)
-    # excel.add_data("Commodities", commodities_data)
+    commodities_data = data.get_equity_data(commodities)
+    pdf.create_header("Commodities")
+    pdf.create_table(commodities_data)
+    excel.add_data("Commodities", commodities_data)
     
     currency_data = data.get_currency_data()
     pdf.create_header("Currency (USD)")
     pdf.create_table(currency_data)
     excel.add_data("Currency (USD)", currency_data)
     
-    # us_treasury_data = data.get_equity_data(us_treasury)
-    # tips = data.get_us_tips_data()
-    # us_treasury_data.update(tips)
+    us_treasury_data = data.get_equity_data(us_treasury)
+    tips = data.get_us_tips_data()
+    us_treasury_data.update(tips)
     
     
-    # pdf.create_header("US Treasury Yields")
-    # pdf.create_table(us_treasury_data, type="yield")
-    # excel.add_data("US Treasury Yields", us_treasury_data)
+    pdf.create_header("US Treasury Yields")
+    pdf.create_table(us_treasury_data, type="yield")
+    excel.add_data("US Treasury Yields", us_treasury_data)
     
     
         
-    # cad_treasury_data = data.get_cad_bond_data()
-    # pdf.create_header("CAD Treasury Yields")
-    # pdf.create_table(cad_treasury_data, type="yield")
-    # excel.add_data("CAD Treasury Yields", cad_treasury_data)
+    cad_treasury_data = data.get_cad_bond_data()
+    pdf.create_header("CAD Treasury Yields")
+    pdf.create_table(cad_treasury_data, type="yield")
+    excel.add_data("CAD Treasury Yields", cad_treasury_data)
     
     
     # P = Plot()
@@ -109,8 +116,10 @@ def retireve_pdf():
 
     # # pdf.add_image("AAPL.png", 0,0)
 
-    # excel.save()
+    #excel.save()
     pdf.save('output')
+
+    print(data.calculate_portfolio())
 
 def add_plot(P, ticker, name, data, pdf):
     P.plot(data.daily_data[ticker], num_years=5, title=f"{name}", xlabel="Date", ylabel="Price", color1=DARK_RED, linewidth=3.0, label=f"{ticker} Price", name=name)
@@ -156,11 +165,12 @@ def email_pdf():
 
     
 def run():
-    try:
         retireve_pdf()
         email_pdf()
-    except Exception as e:
-        print(e)
+    # try:
+    #     pass
+    # except Exception as e:
+    #     print(e)
 
 def main(): 
 
@@ -170,4 +180,5 @@ def main():
         schedule.run_pending()
         time.sleep(1)
 
-main()
+#main()
+run()
